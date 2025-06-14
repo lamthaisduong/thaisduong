@@ -10,23 +10,28 @@ if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 if "balance" not in st.session_state:
     st.session_state.balance = 0
-if "bg_color" not in st.session_state:
-    st.session_state.bg_color = "#f0f2f6"
 
-def set_background(color):
+def set_animated_background():
     st.markdown(
-        f"""
+        """
         <style>
-        .stApp {{
-            background-color: {color} !important;
-        }}
+        .stApp {
+            background: linear-gradient(-45deg, #ffecd2, #fcb69f, #a1c4fd, #c2e9fb, #fcb69f, #ffecd2);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+        @keyframes gradientBG {
+            0% {background-position: 0% 50%;}
+            50% {background-position: 100% 50%;}
+            100% {background-position: 0% 50%;}
+        }
         </style>
         """,
         unsafe_allow_html=True
     )
 
 def login():
-    st.title("🔐 Đăng nhập")
+    st.title("🎰 BET 888")
     username = st.text_input("Tên đăng nhập")
     password = st.text_input("Mật khẩu", type="password")
     if st.button("Đăng nhập"):
@@ -50,21 +55,8 @@ def recharge():
         st.success(f"Đã nạp {amount} VNĐ. Số dư hiện tại: {st.session_state.balance} VNĐ")
 
 def tai_xiu_game():
-    # Chọn màu nền
-    bg = st.selectbox(
-        "Chọn màu nền:",
-        {
-            "Xanh nhạt": "#f0f2f6",
-            "Trắng": "#ffffff",
-            "Xanh lá": "#d4fcd4",
-            "Vàng": "#fff7d6",
-            "Hồng": "#ffe6f2",
-            "Xám": "#e0e0e0"
-        }
-    )
-    set_background(bg)
-
-    st.title("🎲 Game Tài Xỉu Đơn Giản")
+    set_animated_background()
+    st.title("🎰 BET 888")
     st.write(f"Số dư hiện tại: **{st.session_state.balance} VNĐ**")
     recharge()
     st.markdown("---")
@@ -125,6 +117,7 @@ def tai_xiu_game():
     st.info("Đây chỉ là game mô phỏng, không dùng cho mục đích cá cược thực tế.")
 
 if not st.session_state.logged_in:
+    set_animated_background()
     login()
 else:
     tai_xiu_game()
