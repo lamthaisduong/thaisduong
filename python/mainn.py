@@ -20,8 +20,6 @@ if "overlay_dice" not in st.session_state:
     st.session_state.overlay_dice = [1, 1, 1]
 if "overlay_text" not in st.session_state:
     st.session_state.overlay_text = ""
-if "overlay_manual_close" not in st.session_state:
-    st.session_state.overlay_manual_close = False
 
 def set_animated_background():
     st.markdown(
@@ -49,25 +47,6 @@ def set_animated_background():
             max-width: 500px;
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
-        }
-        /* Overlay button style */
-        .overlay-btn-container {
-            position: fixed;
-            z-index: 100000;
-            left: 0; right: 0; bottom: 8vh;
-            display: flex;
-            justify-content: center;
-        }
-        .overlay-btn {
-            font-size: 1.3rem !important;
-            padding: 0.7rem 2.5rem !important;
-            border-radius: 2rem !important;
-            background: linear-gradient(90deg,#ffe600,#00c3ff,#ff0084);
-            color: #222 !important;
-            font-weight: bold;
-            border: none;
-            box-shadow: 0 2px 16px #0004;
-            cursor: pointer;
         }
         </style>
         """,
@@ -107,53 +86,6 @@ def show_dice_overlay(dice, text=""):
         """,
         unsafe_allow_html=True
     )
-    # Nút tắt xúc xắc nổi bật, căn giữa overlay
-    st.markdown(
-        """
-        <div class="overlay-btn-container">
-            <form action="" method="post">
-                <button class="overlay-btn" name="close_overlay" type="submit">Tắt xúc xắc</button>
-            </form>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-    # Xử lý sự kiện tắt xúc xắc
-    if st.session_state.get("close_overlay_btn_clicked", False):
-        st.session_state.overlay_manual_close = True
-        st.session_state.show_overlay = False
-        st.session_state["close_overlay_btn_clicked"] = False
-        st.experimental_rerun()
-
-    # Đọc sự kiện submit form (hack cho Streamlit)
-    import streamlit.components.v1 as components
-    components.html(
-        """
-        <script>
-        const btn = window.parent.document.querySelector('button[name="close_overlay"]');
-        if(btn){
-            btn.onclick = function(){
-                window.parent.postMessage({isCloseOverlay:true}, "*");
-            }
-        }
-        window.addEventListener("message", (event) => {
-            if(event.data && event.data.isCloseOverlay){
-                window.parent.postMessage({streamlitCloseOverlay:true}, "*");
-            }
-        });
-        </script>
-        """,
-        height=0,
-    )
-    # Lắng nghe sự kiện từ JS
-    if "streamlitCloseOverlay" not in st.session_state:
-        st.session_state.streamlitCloseOverlay = False
-    import streamlit_javascript as st_js
-    js_res = st_js.st_javascript("window.addEventListener('message', (e) => { if(e.data && e.data.streamlitCloseOverlay){window.streamlitCloseOverlay=true;} }); window.streamlitCloseOverlay || false;")
-    if js_res:
-        st.session_state.overlay_manual_close = True
-        st.session_state.show_overlay = False
-        st.experimental_rerun()
 
 def register():
     set_animated_background()
@@ -237,18 +169,16 @@ def tai_xiu_game():
 
     result_placeholder = st.empty()
 
-    # Xử lý overlay xúc xắc tự động tắt sau 3 giây hoặc khi người dùng nhấn nút tắt
+    # Xử lý overlay xúc xắc tự động tắt sau 3 giây
     if st.session_state.show_overlay:
         show_dice_overlay(st.session_state.overlay_dice, st.session_state.overlay_text)
         # Nếu đã đủ 3 giây thì tắt overlay và rerun
-        if not st.session_state.overlay_manual_close and time.time() - st.session_state.overlay_start_time > 3:
+        if time.time() - st.session_state.overlay_start_time > 3:
             st.session_state.show_overlay = False
-            st.session_state.overlay_manual_close = False
             st.experimental_rerun()
         st.stop()
 
     if roll_btn:
-        st.session_state.overlay_manual_close = False
         # Hiệu ứng xúc xắc to phủ màn hình
         for i in range(10):
             dice = [random.randint(1, 6) for _ in range(3)]
@@ -290,10 +220,6 @@ def tai_xiu_game():
     logout()
     st.info("Đây chỉ là game mô phỏng, không dùng cho mục đích cá cược thực tế.")
     st.markdown('</div>', unsafe_allow_html=True)
-
-    # Hiển thị overlay nếu đang lắc
-    if st.session_state.show_overlay:
-        show_dice_overlay(st.session_state.overlay_dice, st.session_state.overlay_text)
 
 # Điều hướng giữa đăng nhập và đăng ký
 if "page" not in st.session_state:
