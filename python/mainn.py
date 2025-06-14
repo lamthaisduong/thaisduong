@@ -10,6 +10,20 @@ if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 if "balance" not in st.session_state:
     st.session_state.balance = 0
+if "bg_color" not in st.session_state:
+    st.session_state.bg_color = "#f0f2f6"
+
+def set_background(color):
+    st.markdown(
+        f"""
+        <style>
+        .stApp {{
+            background-color: {color} !important;
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
 
 def login():
     st.title("🔐 Đăng nhập")
@@ -36,7 +50,21 @@ def recharge():
         st.success(f"Đã nạp {amount} VNĐ. Số dư hiện tại: {st.session_state.balance} VNĐ")
 
 def tai_xiu_game():
-    st.title("🎲 Bet 888 🎲")
+    # Chọn màu nền
+    bg = st.selectbox(
+        "Chọn màu nền:",
+        {
+            "Xanh nhạt": "#f0f2f6",
+            "Trắng": "#ffffff",
+            "Xanh lá": "#d4fcd4",
+            "Vàng": "#fff7d6",
+            "Hồng": "#ffe6f2",
+            "Xám": "#e0e0e0"
+        }
+    )
+    set_background(bg)
+
+    st.title("🎲 Game Tài Xỉu Đơn Giản")
     st.write(f"Số dư hiện tại: **{st.session_state.balance} VNĐ**")
     recharge()
     st.markdown("---")
@@ -87,12 +115,12 @@ def tai_xiu_game():
         if result in choice:
             st.session_state.balance += bet
             st.success(f"Bạn thắng! Nhận {bet} VNĐ. Số dư: {st.session_state.balance} VNĐ")
-        elif result == "Bộ ba đặc biệt (3 hoặc 18)":
-            st.session_state.balance -= bet
-            st.warning(f"Bộ ba đặc biệt! Nhà cái ăn hết. Số dư: {st.session_state.balance} VNĐ")
         else:
             st.session_state.balance -= bet
-            st.error(f"Bạn thua! Mất {bet} VNĐ. Số dư: {st.session_state.balance} VNĐ")
+            if result == "Bộ ba đặc biệt (3 hoặc 18)":
+                st.warning(f"Bộ ba đặc biệt! Nhà cái ăn hết. Số dư: {st.session_state.balance} VNĐ")
+            else:
+                st.error(f"Bạn thua! Mất {bet} VNĐ. Số dư: {st.session_state.balance} VNĐ")
     logout()
     st.info("Đây chỉ là game mô phỏng, không dùng cho mục đích cá cược thực tế.")
 
