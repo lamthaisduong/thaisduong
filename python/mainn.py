@@ -1,12 +1,11 @@
 import streamlit as st
 import random
+import time
 
-# Thông tin tài khoản mẫu
 USER = "admin"
 PASS = "123456"
 MIN_BET = 10
 
-# Khởi tạo session state
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 if "balance" not in st.session_state:
@@ -56,17 +55,28 @@ def tai_xiu_game():
         key="bet_input"
     )
     choice = st.radio("Bạn chọn:", ("Tài (11-17)", "Xỉu (4-10)"))
-    if st.button("Lắc xúc xắc"):
+    roll_btn = st.button("Lắc xúc xắc")
+
+    dice_placeholder = st.empty()
+    result_placeholder = st.empty()
+
+    if roll_btn:
+        # Hiệu ứng lắc xúc xắc chuyển động
+        for i in range(10):
+            dice = [random.randint(1, 6) for _ in range(3)]
+            dice_placeholder.write(f"🎲 Đang lắc: {dice[0]}, {dice[1]}, {dice[2]}")
+            time.sleep(0.15)
+        # Kết quả cuối cùng
         dice = [random.randint(1, 6) for _ in range(3)]
         total = sum(dice)
-        st.write(f"🎲 Kết quả: {dice[0]}, {dice[1]}, {dice[2]} (Tổng: {total})")
+        dice_placeholder.write(f"🎲 Kết quả: {dice[0]}, {dice[1]}, {dice[2]} (Tổng: {total})")
         if 4 <= total <= 10:
             result = "Xỉu"
         elif 11 <= total <= 17:
             result = "Tài"
         else:
             result = "Bộ ba đặc biệt (3 hoặc 18)"
-        st.write(f"Kết quả: **{result}**")
+        result_placeholder.write(f"Kết quả: **{result}**")
         if result in choice:
             st.session_state.balance += bet
             st.success(f"Bạn thắng! Nhận {bet} VNĐ. Số dư: {st.session_state.balance} VNĐ")
@@ -79,7 +89,6 @@ def tai_xiu_game():
     logout()
     st.info("Đây chỉ là game mô phỏng, không dùng cho mục đích cá cược thực tế.")
 
-# Main
 if not st.session_state.logged_in:
     login()
 else:
