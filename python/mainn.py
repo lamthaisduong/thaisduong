@@ -16,22 +16,27 @@ def set_animated_background():
         """
         <style>
         .stApp {
-            background: linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%);
-            background-size: 200% 200%;
-            animation: gradientBG 10s ease-in-out infinite;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 25%, #a1c4fd 50%, #c2e9fb 75%, #fcb69f 100%);
+            background-size: 400% 400%;
+            animation: gradientBG 18s ease-in-out infinite;
+            min-height: 100vh;
         }
         @keyframes gradientBG {
             0% {background-position: 0% 50%;}
+            25% {background-position: 50% 100%;}
             50% {background-position: 100% 50%;}
+            75% {background-position: 50% 0%;}
             100% {background-position: 0% 50%;}
         }
         .main-content {
-            background: rgba(255,255,255,0.85);
-            border-radius: 18px;
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            background: rgba(255,255,255,0.80);
+            border-radius: 22px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18);
             padding: 2.5rem 2rem 2rem 2rem;
-            margin: 2rem auto;
-            max-width: 480px;
+            margin: 2.5rem auto;
+            max-width: 500px;
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
         }
         </style>
         """,
