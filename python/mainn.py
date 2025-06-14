@@ -36,7 +36,7 @@ def recharge():
         st.success(f"Đã nạp {amount} VNĐ. Số dư hiện tại: {st.session_state.balance} VNĐ")
 
 def tai_xiu_game():
-    st.title("🎲 Game Tài Xỉu Đơn Giản")
+    st.title("🎲 Bet 888")
     st.write(f"Số dư hiện tại: **{st.session_state.balance} VNĐ**")
     recharge()
     st.markdown("---")
