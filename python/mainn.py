@@ -1,9 +1,10 @@
 import streamlit as st
 import random
 
-# Khởi tạo dữ liệu người dùng mẫu
+# Thông tin tài khoản mẫu
 USER = "admin"
 PASS = "123456"
+MIN_BET = 10
 
 # Khởi tạo session state
 if "logged_in" not in st.session_state:
@@ -30,7 +31,7 @@ def logout():
 
 def recharge():
     st.subheader("💰 Nạp tiền vào tài khoản")
-    amount = st.number_input("Nhập số tiền muốn nạp", min_value=10, max_value=1000000, value=100, step=10)
+    amount = st.number_input("Nhập số tiền muốn nạp", min_value=MIN_BET, max_value=1000000, value=100, step=10)
     if st.button("Nạp tiền"):
         st.session_state.balance += amount
         st.success(f"Đã nạp {amount} VNĐ. Số dư hiện tại: {st.session_state.balance} VNĐ")
@@ -40,13 +41,22 @@ def tai_xiu_game():
     st.write(f"Số dư hiện tại: **{st.session_state.balance} VNĐ**")
     recharge()
     st.markdown("---")
+    if st.session_state.balance < MIN_BET:
+        st.warning(f"Số dư của bạn nhỏ hơn mức cược tối thiểu ({MIN_BET} VNĐ). Vui lòng nạp thêm tiền để chơi.")
+        logout()
+        return
+
     st.write("Chọn số tiền cược và dự đoán kết quả:")
-    bet = st.number_input("Số tiền cược", min_value=10, max_value=st.session_state.balance, value=10, step=10)
+    bet = st.number_input(
+        "Số tiền cược",
+        min_value=MIN_BET,
+        max_value=st.session_state.balance,
+        value=MIN_BET,
+        step=10,
+        key="bet_input"
+    )
     choice = st.radio("Bạn chọn:", ("Tài (11-17)", "Xỉu (4-10)"))
     if st.button("Lắc xúc xắc"):
-        if bet > st.session_state.balance:
-            st.error("Số dư không đủ!")
-            return
         dice = [random.randint(1, 6) for _ in range(3)]
         total = sum(dice)
         st.write(f"🎲 Kết quả: {dice[0]}, {dice[1]}, {dice[2]} (Tổng: {total})")
@@ -69,7 +79,7 @@ def tai_xiu_game():
     logout()
     st.info("Đây chỉ là game mô phỏng, không dùng cho mục đích cá cược thực tế.")
 
-# Luồng chính
+# Main
 if not st.session_state.logged_in:
     login()
 else:
