@@ -16,14 +16,22 @@ def set_animated_background():
         """
         <style>
         .stApp {
-            background: linear-gradient(-45deg, #ffecd2, #fcb69f, #a1c4fd, #c2e9fb, #fcb69f, #ffecd2);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
+            background: linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%);
+            background-size: 200% 200%;
+            animation: gradientBG 10s ease-in-out infinite;
         }
         @keyframes gradientBG {
             0% {background-position: 0% 50%;}
             50% {background-position: 100% 50%;}
             100% {background-position: 0% 50%;}
+        }
+        .main-content {
+            background: rgba(255,255,255,0.85);
+            border-radius: 18px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            padding: 2.5rem 2rem 2rem 2rem;
+            margin: 2rem auto;
+            max-width: 480px;
         }
         </style>
         """,
@@ -31,7 +39,9 @@ def set_animated_background():
     )
 
 def login():
-    st.title("🎰 BET 888")
+    set_animated_background()
+    st.markdown('<div class="main-content">', unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align:center; color:#5f2c82;'>🎰 BET 888</h1>", unsafe_allow_html=True)
     username = st.text_input("Tên đăng nhập")
     password = st.text_input("Mật khẩu", type="password")
     if st.button("Đăng nhập"):
@@ -40,6 +50,7 @@ def login():
             st.success("Đăng nhập thành công!")
         else:
             st.error("Sai tên đăng nhập hoặc mật khẩu.")
+    st.markdown('</div>', unsafe_allow_html=True)
 
 def logout():
     if st.button("Đăng xuất"):
@@ -56,13 +67,15 @@ def recharge():
 
 def tai_xiu_game():
     set_animated_background()
-    st.title("🎰 BET 888")
+    st.markdown('<div class="main-content">', unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align:center; color:#5f2c82;'>🎰 BET 888</h1>", unsafe_allow_html=True)
     st.write(f"Số dư hiện tại: **{st.session_state.balance} VNĐ**")
     recharge()
     st.markdown("---")
     if st.session_state.balance < MIN_BET:
         st.warning(f"Số dư của bạn nhỏ hơn mức cược tối thiểu ({MIN_BET} VNĐ). Vui lòng nạp thêm tiền để chơi.")
         logout()
+        st.markdown('</div>', unsafe_allow_html=True)
         return
 
     st.write("Chọn số tiền cược và dự đoán kết quả:")
@@ -83,8 +96,8 @@ def tai_xiu_game():
     def show_dice_center(dice, text=""):
         dice_html = f"""
         <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
-            <div style="font-size: 2.5rem;">🎲 {dice[0]}, {dice[1]}, {dice[2]}</div>
-            <div style="margin-top: 8px;">{text}</div>
+            <div style="font-size: 2.5rem; color:#5f2c82;">🎲 {dice[0]}, {dice[1]}, {dice[2]}</div>
+            <div style="margin-top: 8px; color:#5f2c82;">{text}</div>
         </div>
         """
         dice_placeholder.markdown(dice_html, unsafe_allow_html=True)
@@ -97,27 +110,34 @@ def tai_xiu_game():
         dice = [random.randint(1, 6) for _ in range(3)]
         total = sum(dice)
         show_dice_center(dice, f"Kết quả: Tổng = {total}")
-        if 4 <= total <= 10:
-            result = "Xỉu"
-        elif 11 <= total <= 17:
-            result = "Tài"
+
+        # Tỉ lệ thắng 20%
+        win_chance = random.randint(1, 100)
+        if win_chance <= 20:
+            # Người chơi thắng
+            if choice == "Tài (11-17)":
+                result = "Tài"
+            else:
+                result = "Xỉu"
         else:
-            result = "Bộ ba đặc biệt (3 hoặc 18)"
+            # Người chơi thua
+            if choice == "Tài (11-17)":
+                result = "Xỉu"
+            else:
+                result = "Tài"
+
         result_placeholder.write(f"Kết quả: **{result}**")
         if result in choice:
             st.session_state.balance += bet
             st.success(f"Bạn thắng! Nhận {bet} VNĐ. Số dư: {st.session_state.balance} VNĐ")
         else:
             st.session_state.balance -= bet
-            if result == "Bộ ba đặc biệt (3 hoặc 18)":
-                st.warning(f"Bộ ba đặc biệt! Nhà cái ăn hết. Số dư: {st.session_state.balance} VNĐ")
-            else:
-                st.error(f"Bạn thua! Mất {bet} VNĐ. Số dư: {st.session_state.balance} VNĐ")
+            st.error(f"Bạn thua! Mất {bet} VNĐ. Số dư: {st.session_state.balance} VNĐ")
     logout()
     st.info("Đây chỉ là game mô phỏng, không dùng cho mục đích cá cược thực tế.")
+    st.markdown('</div>', unsafe_allow_html=True)
 
 if not st.session_state.logged_in:
-    set_animated_background()
     login()
 else:
     tai_xiu_game()
