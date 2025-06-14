@@ -60,16 +60,23 @@ def tai_xiu_game():
     dice_placeholder = st.empty()
     result_placeholder = st.empty()
 
+    def show_dice_center(dice, text=""):
+        dice_html = f"""
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <div style="font-size: 2.5rem;">🎲 {dice[0]}, {dice[1]}, {dice[2]}</div>
+            <div style="margin-top: 8px;">{text}</div>
+        </div>
+        """
+        dice_placeholder.markdown(dice_html, unsafe_allow_html=True)
+
     if roll_btn:
-        # Hiệu ứng lắc xúc xắc chuyển động
         for i in range(10):
             dice = [random.randint(1, 6) for _ in range(3)]
-            dice_placeholder.write(f"🎲 Đang lắc: {dice[0]}, {dice[1]}, {dice[2]}")
+            show_dice_center(dice, "Đang lắc...")
             time.sleep(0.15)
-        # Kết quả cuối cùng
         dice = [random.randint(1, 6) for _ in range(3)]
         total = sum(dice)
-        dice_placeholder.write(f"🎲 Kết quả: {dice[0]}, {dice[1]}, {dice[2]} (Tổng: {total})")
+        show_dice_center(dice, f"Kết quả: Tổng = {total}")
         if 4 <= total <= 10:
             result = "Xỉu"
         elif 11 <= total <= 17:
