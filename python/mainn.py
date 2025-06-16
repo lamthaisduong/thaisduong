@@ -60,9 +60,24 @@ if "spinning" not in st.session_state:
 if "last_result" not in st.session_state:
     st.session_state.last_result = ""
 
+# --- Kiểm tra số dư tối thiểu ---
+if st.session_state.balance < 10:
+    st.warning("Bạn cần nạp thêm tiền để chơi! (Tối thiểu 10 💰)")
+    if st.button("Nạp thêm 1000 💰"):
+        st.session_state.balance += 1000
+        st.success("Đã nạp thêm 1000 💰!")
+    st.markdown('</div>', unsafe_allow_html=True)
+    st.stop()
+
 # --- Chọn mức cược ---
-st.write(f"Số dư: **{st.session_state.balance}** 💰")
-bet = st.number_input("Chọn mức cược", min_value=10, max_value=st.session_state.balance, value=10, step=10)
+max_bet = max(10, st.session_state.balance)
+bet = st.number_input(
+    "Chọn mức cược",
+    min_value=10,
+    max_value=st.session_state.balance,
+    value=min(10, st.session_state.balance),
+    step=10
+)
 
 # --- Nút quay ---
 spin = st.button("🎲 Quay Nổ Hũ", use_container_width=True)
