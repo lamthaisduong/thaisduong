@@ -1,10 +1,7 @@
 import streamlit as st
-import qrcode
-from PIL import Image
-import io
 import datetime
 
-st.set_page_config(page_title="Love Days & QR", page_icon="❤️")
+st.set_page_config(page_title="Love Days", page_icon="❤️")
 
 # Hiệu ứng trái tim động và tên hai bạn
 st.markdown("""
@@ -41,17 +38,4 @@ today = datetime.date.today()
 days = (today - start_date).days
 if days > 357:
     days = 357
-st.markdown(f"<h2 style='text-align:center;color:#e74c3c;'>Ngày bên nhau: <b>{days}</b> / 357 ngày</h2>", unsafe_allow_html=True)
-
-# Tạo mã QR code
-qr_text = f"Lâm Thái Dương 💖 Nguyễn Trần Như Ý - {days} ngày bên nhau"
-qr_input = st.text_input("Nội dung mã QR (có thể sửa):", qr_text)
-qr = qrcode.QRCode(box_size=8, border=2)
-qr.add_data(qr_input)
-qr.make(fit=True)
-img = qr.make_image(fill_color="red", back_color="white")
-buf = io.BytesIO()
-img.save(buf, format="PNG")
-st.image(buf.getvalue(), caption="Mã QR của hai bạn", use_column_width=True)
-
-st.info("Chúc hai bạn luôn hạnh phúc! ❤️")
+st.markdown(f"<h2 style='text-align:center;color:#e74c3c;'>Ngày bên nhau: <b>{days}</b> / 357 ngày
