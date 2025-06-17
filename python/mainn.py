@@ -44,9 +44,10 @@ if days > 357:
 st.markdown(f"<h2 style='text-align:center;color:#e74c3c;'>Ngày bên nhau: <b>{days}</b> / 357 ngày</h2>", unsafe_allow_html=True)
 
 # Tạo mã QR code
-qr_text = st.text_input("Nhập nội dung hoặc link để tạo mã QR", "Lâm Thái Dương 💖 Nguyễn Trần Như Ý - {days} ngày bên nhau")
+qr_text = f"Lâm Thái Dương 💖 Nguyễn Trần Như Ý - {days} ngày bên nhau"
+qr_input = st.text_input("Nội dung mã QR (có thể sửa):", qr_text)
 qr = qrcode.QRCode(box_size=8, border=2)
-qr.add_data(qr_text)
+qr.add_data(qr_input)
 qr.make(fit=True)
 img = qr.make_image(fill_color="red", back_color="white")
 buf = io.BytesIO()
