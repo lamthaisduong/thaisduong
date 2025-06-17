@@ -89,7 +89,6 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-st.success("Chúc hai bạn luôn hạnh phúc! ❤️")
 
 # Nhạc nền (nếu muốn, chỉ phát khi click play)
 st.audio("https://cdn.pixabay.com/audio/2023/03/13/audio_128bfa6b5b.mp3")
