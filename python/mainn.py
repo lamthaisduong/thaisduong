@@ -38,4 +38,4 @@ today = datetime.date.today()
 days = (today - start_date).days
 if days > 357:
     days = 357
-st.markdown(f"<h2 style='text-align:center;color:#e74c3c;'>Ngày bên nhau: <b>{days}</b> / 357 ngày
+st.markdown(f"<h2 style='text-align:center;color:#e74c3c;'>Ngày bên nhau: <b>{days}</b> / 357 ngày</h2>", unsafe_allow_html=True)
