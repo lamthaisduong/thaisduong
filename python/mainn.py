@@ -1,94 +1,115 @@
 import streamlit as st
-import datetime
 import random
+import time
 
-st.set_page_config(page_title="Love Day", page_icon="❤️")
+st.set_page_config(page_title="666 Slot", page_icon="🎰")
 
-# Hiệu ứng trái tim rơi bằng HTML + CSS
+# CSS cho khung nhỏ gọn và hiệu ứng trúng lớn
 st.markdown("""
 <style>
-.heart-fall-container {
-    position: relative;
-    width: 100%;
-    height: 320px;
-    overflow: hidden;
-    background: linear-gradient(180deg, #fffbe6 0%, #ffe6f7 100%);
+.slot-frame {
+    background: rgba(34,34,34,0.97);
     border-radius: 18px;
-    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 24px #0008;
+    padding: 1.5rem 1.2rem 1.2rem 1.2rem;
+    margin: 2.5rem auto;
+    max-width: 340px;
+    min-width: 260px;
 }
-.heart-fall {
-    position: absolute;
-    animation: fall linear infinite;
-    font-size: 2.2rem;
-    user-select: none;
-    pointer-events: none;
-}
-@keyframes fall {
-    0% {
-        top: -40px;
-        opacity: 0.7;
-        transform: translateY(0) scale(1) rotate(0deg);
-    }
-    70% {
-        opacity: 1;
-    }
-    100% {
-        top: 320px;
-        opacity: 0.2;
-        transform: translateY(40px) scale(1.2) rotate(30deg);
-    }
-}
-.love-names {
+.slot-symbol {
+    font-size: 2.5rem;
+    margin: 0.3rem 0.7rem;
+    filter: drop-shadow(0 2px 8px #fff8);
     text-align: center;
-    font-size: 1.4rem;
-    color: #e74c3c;
-    font-weight: bold;
-    margin-bottom: 0.7rem;
-    letter-spacing: 1px;
 }
-.love-days {
+.big-win-anim {
+    color: #ffe600;
+    font-size: 1.6rem;
+    text-shadow: 0 2px 16px #ff0084, 0 0 8px #fff;
     text-align: center;
-    color: #e74c3c;
-    font-size: 1.2rem;
+    margin-top: 1.2rem;
     margin-bottom: 1.2rem;
+    font-weight: bold;
+    letter-spacing: 2px;
+    animation: blink 0.25s alternate infinite;
+}
+@keyframes blink {
+    0% { opacity: 1;}
+    100% { opacity: 0.3;}
 }
 </style>
 """, unsafe_allow_html=True)
 
-# Tạo HTML cho nhiều trái tim rơi ngẫu nhiên
-def gen_hearts_html(n=18):
-    html = '<div class="heart-fall-container">'
-    for i in range(n):
-        left = random.randint(2, 95)
-        duration = random.uniform(2.5, 4.5)
-        delay = random.uniform(0, 2.5)
-        size = random.uniform(1.3, 2.2)
-        heart = random.choice(['❤️','💖','💕','💗','💓','💞'])
-        html += f'<div class="heart-fall" style="left:{left}%; animation-duration:{duration}s; animation-delay:{delay}s; font-size:{size}rem;">{heart}</div>'
-    html += '</div>'
-    return html
+SYMBOLS = ["🍒", "🍋", "🔔", "🍀", "💎", "7️⃣", "⭐", "🍉", "🍇"]
 
-st.markdown(gen_hearts_html(22), unsafe_allow_html=True)
+if "balance" not in st.session_state:
+    st.session_state.balance = 1000
+if "slots" not in st.session_state:
+    st.session_state.slots = [random.choice(SYMBOLS) for _ in range(3)]
+if "last_result" not in st.session_state:
+    st.session_state.last_result = ""
+if "big_win" not in st.session_state:
+    st.session_state.big_win = False
 
-# Tên hai bạn
-st.markdown("""
-<div class="love-names">
-    Lâm Thái Dương <span style="color:#ff69b4;">&nbsp;💖&nbsp;</span> Nguyễn Trần Như Ý
-</div>
-""", unsafe_allow_html=True)
+st.markdown('<div class="slot-frame">', unsafe_allow_html=True)
+st.markdown("<h3 style='text-align:center; color:#ff0084;'>🎰 666 Slot</h3>", unsafe_allow_html=True)
+st.write(f"Số dư: **{st.session_state.balance}** 💰")
 
-# Đếm số ngày
-start_date = datetime.date(2023, 7, 26)  # Ngày bắt đầu (bạn có thể đổi)
-today = datetime.date.today()
-days = (today - start_date).days
-if days > 357:
-    days = 357
-
-st.markdown(
-    f"<div class='love-days'>Ngày bên nhau: <b>{days}</b> / 357 ngày</div>",
-    unsafe_allow_html=True
+bet = st.number_input(
+    "Cược",
+    min_value=10,
+    max_value=st.session_state.balance,
+    value=min(10, st.session_state.balance),
+    step=10,
+    key="bet_input"
 )
 
+spin = st.button("🎲 Quay", use_container_width=True)
 
-# Nhạc nền (nếu muốn, chỉ phát khi click play)
-st.audio("https://cdn.pixabay.com/audio/2023/03/13/audio_128bfa6b5b.mp3")
+def spin_slots():
+    for _ in range(12):
+        st.session_state.slots = [random.choice(SYMBOLS) for _ in range(3)]
+        slot_cols = st.columns(3)
+        for i in range(3):
+            slot_cols[i].markdown(f"<div class='slot-symbol'>{st.session_state.slots[i]}</div>", unsafe_allow_html=True)
+        time.sleep(0.07)
+    st.session_state.slots = [random.choice(SYMBOLS) for _ in range(3)]
+
+if spin and st.session_state.balance >= bet:
+    st.session_state.balance -= bet
+    st.session_state.big_win = False
+    spin_slots()
+    slots = st.session_state.slots
+    if slots[0] == slots[1] == slots[2]:
+        if slots[0] == "7️⃣":
+            win = bet * 50
+            st.session_state.balance += win
+            st.session_state.last_result = f"<div class='big-win-anim'>💥 JACKPOT! 7️⃣7️⃣7️⃣ - Thắng {win} 💰</div>"
+            st.session_state.big_win = True
+        else:
+            win = bet * 10
+            st.session_state.balance += win
+            st.session_state.last_result = f"<div class='big-win-anim'>🎉 Nổ hũ! {slots[0]*3} - Thắng {win} 💰</div>"
+            st.session_state.big_win = True
+    elif slots[0] == slots[1] or slots[1] == slots[2] or slots[0] == slots[2]:
+        win = bet * 2
+        st.session_state.balance += win
+        st.session_state.last_result = f"<div style='color:#ffe600;text-align:center;font-weight:bold;'>✨ Trúng nhỏ! Thắng {win} 💰</div>"
+    else:
+        st.session_state.last_result = "<div style='color:#fff;text-align:center;'>Chúc may mắn lần sau!</div>"
+
+# Hiển thị slot
+slot_cols = st.columns(3)
+for i in range(3):
+    slot_cols[i].markdown(f"<div class='slot-symbol'>{st.session_state.slots[i]}</div>", unsafe_allow_html=True)
+
+# Hiển thị kết quả
+if st.session_state.last_result:
+    st.markdown(st.session_state.last_result, unsafe_allow_html=True)
+
+if st.button("Nạp thêm 1000 💰"):
+    st.session_state.balance += 1000
+    st.success("Đã nạp thêm 1000 💰!")
+
+st.markdown('</div>', unsafe_allow_html=True)
+st.info("Chơi giải trí, không dùng cho mục đích cá cược thực tế.")
