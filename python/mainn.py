@@ -1,115 +1,130 @@
-import streamlit as st
-import random
-import time
+vimport streamlit as st
 
-st.set_page_config(page_title="666 Slot", page_icon="🎰")
+st.set_page_config(page_title="Laptop Shop", page_icon="💻")
 
-# CSS cho khung nhỏ gọn và hiệu ứng trúng lớn
-st.markdown("""
-<style>
-.slot-frame {
-    background: rgba(34,34,34,0.97);
-    border-radius: 18px;
-    box-shadow: 0 4px 24px #0008;
-    padding: 1.5rem 1.2rem 1.2rem 1.2rem;
-    margin: 2.5rem auto;
-    max-width: 340px;
-    min-width: 260px;
-}
-.slot-symbol {
-    font-size: 2.5rem;
-    margin: 0.3rem 0.7rem;
-    filter: drop-shadow(0 2px 8px #fff8);
-    text-align: center;
-}
-.big-win-anim {
-    color: #ffe600;
-    font-size: 1.6rem;
-    text-shadow: 0 2px 16px #ff0084, 0 0 8px #fff;
-    text-align: center;
-    margin-top: 1.2rem;
-    margin-bottom: 1.2rem;
-    font-weight: bold;
-    letter-spacing: 2px;
-    animation: blink 0.25s alternate infinite;
-}
-@keyframes blink {
-    0% { opacity: 1;}
-    100% { opacity: 0.3;}
-}
-</style>
-""", unsafe_allow_html=True)
+# --- Dữ liệu mẫu ---
+laptops = [
+    {
+        "name": "MacBook Air M2 2024",
+        "price": 28990000,
+        "img": "https://cdn.tgdd.vn/Products/Images/44/322927/macbook-air-m2-2024-13-inch-1-2.jpg",
+        "desc": "Chip Apple M2, 8GB, SSD 256GB, màn 13.6 inch, pin 18h, siêu nhẹ chỉ 1.24kg."
+    },
+    {
+        "name": "Dell XPS 13 Plus",
+        "price": 36990000,
+        "img": "https://cdn.tgdd.vn/Products/Images/44/309776/dell-xps-13-plus-9320-i7-1200x800.jpg",
+        "desc": "Intel Core i7 Gen 12, RAM 16GB, SSD 512GB, màn OLED 13.4 inch, thiết kế cao cấp."
+    },
+    {
+        "name": "ASUS ROG Zephyrus G14",
+        "price": 32990000,
+        "img": "https://cdn.tgdd.vn/Products/Images/44/309779/asus-rog-zephyrus-g14-2023-1.jpg",
+        "desc": "AMD Ryzen 7, RTX 4060, RAM 16GB, SSD 1TB, màn 14 inch 165Hz, gaming siêu mỏng nhẹ."
+    },
+    {
+        "name": "HP Pavilion 15",
+        "price": 15990000,
+        "img": "https://cdn.tgdd.vn/Products/Images/44/309778/hp-pavilion-15-eg2082tu-i5-7c0x3pa-1.jpg",
+        "desc": "Intel Core i5 Gen 12, RAM 8GB, SSD 512GB, màn 15.6 inch Full HD, pin lâu."
+    }
+]
 
-SYMBOLS = ["🍒", "🍋", "🔔", "🍀", "💎", "7️⃣", "⭐", "🍉", "🍇"]
+# --- Quản lý user ---
+if "users" not in st.session_state:
+    st.session_state.users = {"admin": "123456"}
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
+if "username" not in st.session_state:
+    st.session_state.username = ""
+if "page" not in st.session_state:
+    st.session_state.page = "login"
+if "cart" not in st.session_state:
+    st.session_state.cart = []
 
-if "balance" not in st.session_state:
-    st.session_state.balance = 1000
-if "slots" not in st.session_state:
-    st.session_state.slots = [random.choice(SYMBOLS) for _ in range(3)]
-if "last_result" not in st.session_state:
-    st.session_state.last_result = ""
-if "big_win" not in st.session_state:
-    st.session_state.big_win = False
-
-st.markdown('<div class="slot-frame">', unsafe_allow_html=True)
-st.markdown("<h3 style='text-align:center; color:#ff0084;'>🎰 666 Slot</h3>", unsafe_allow_html=True)
-st.write(f"Số dư: **{st.session_state.balance}** 💰")
-
-bet = st.number_input(
-    "Cược",
-    min_value=10,
-    max_value=st.session_state.balance,
-    value=min(10, st.session_state.balance),
-    step=10,
-    key="bet_input"
-)
-
-spin = st.button("🎲 Quay", use_container_width=True)
-
-def spin_slots():
-    for _ in range(12):
-        st.session_state.slots = [random.choice(SYMBOLS) for _ in range(3)]
-        slot_cols = st.columns(3)
-        for i in range(3):
-            slot_cols[i].markdown(f"<div class='slot-symbol'>{st.session_state.slots[i]}</div>", unsafe_allow_html=True)
-        time.sleep(0.07)
-    st.session_state.slots = [random.choice(SYMBOLS) for _ in range(3)]
-
-if spin and st.session_state.balance >= bet:
-    st.session_state.balance -= bet
-    st.session_state.big_win = False
-    spin_slots()
-    slots = st.session_state.slots
-    if slots[0] == slots[1] == slots[2]:
-        if slots[0] == "7️⃣":
-            win = bet * 50
-            st.session_state.balance += win
-            st.session_state.last_result = f"<div class='big-win-anim'>💥 JACKPOT! 7️⃣7️⃣7️⃣ - Thắng {win} 💰</div>"
-            st.session_state.big_win = True
+def register():
+    st.header("Đăng ký tài khoản")
+    new_user = st.text_input("Tên đăng nhập mới")
+    new_pass = st.text_input("Mật khẩu mới", type="password")
+    confirm_pass = st.text_input("Nhập lại mật khẩu", type="password")
+    if st.button("Đăng ký"):
+        if not new_user or not new_pass:
+            st.error("Vui lòng nhập đầy đủ thông tin.")
+        elif new_user in st.session_state.users:
+            st.error("Tên đăng nhập đã tồn tại.")
+        elif new_pass != confirm_pass:
+            st.error("Mật khẩu nhập lại không khớp.")
         else:
-            win = bet * 10
-            st.session_state.balance += win
-            st.session_state.last_result = f"<div class='big-win-anim'>🎉 Nổ hũ! {slots[0]*3} - Thắng {win} 💰</div>"
-            st.session_state.big_win = True
-    elif slots[0] == slots[1] or slots[1] == slots[2] or slots[0] == slots[2]:
-        win = bet * 2
-        st.session_state.balance += win
-        st.session_state.last_result = f"<div style='color:#ffe600;text-align:center;font-weight:bold;'>✨ Trúng nhỏ! Thắng {win} 💰</div>"
+            st.session_state.users[new_user] = new_pass
+            st.success("Đăng ký thành công! Bạn có thể đăng nhập.")
+            st.session_state.page = "login"
+    if st.button("Quay lại đăng nhập"):
+        st.session_state.page = "login"
+
+def login():
+    st.header("Đăng nhập")
+    username = st.text_input("Tên đăng nhập")
+    password = st.text_input("Mật khẩu", type="password")
+    if st.button("Đăng nhập"):
+        if username in st.session_state.users and st.session_state.users[username] == password:
+            st.session_state.logged_in = True
+            st.session_state.username = username
+            st.success("Đăng nhập thành công!")
+            st.session_state.page = "shop"
+        else:
+            st.error("Sai tên đăng nhập hoặc mật khẩu.")
+    if st.button("Đăng ký tài khoản mới"):
+        st.session_state.page = "register"
+
+def logout():
+    if st.button("Đăng xuất"):
+        st.session_state.logged_in = False
+        st.session_state.username = ""
+        st.session_state.cart = []
+        st.session_state.page = "login"
+        st.success("Đã đăng xuất.")
+
+def show_cart():
+    st.subheader("🛒 Giỏ hàng của bạn")
+    if not st.session_state.cart:
+        st.info("Giỏ hàng đang trống.")
+        return
+    total = 0
+    for item in st.session_state.cart:
+        st.image(item["img"], width=120)
+        st.write(f"**{item['name']}**")
+        st.write(f"Giá: {item['price']:,} VNĐ")
+        st.write("---")
+        total += item["price"]
+    st.write(f"### Tổng cộng: {total:,} VNĐ")
+    if st.button("Thanh toán"):
+        st.success("Cảm ơn bạn đã mua hàng! Đơn hàng của bạn đang được xử lý.")
+        st.session_state.cart = []
+
+def shop():
+    st.markdown("<h1 style='text-align:center;color:#1976d2;'>💻 Laptop Shop</h1>", unsafe_allow_html=True)
+    st.write(f"Xin chào, **{st.session_state.username}**")
+    logout()
+    st.markdown("---")
+    st.subheader("Danh sách sản phẩm")
+    cols = st.columns(2)
+    for i, laptop in enumerate(laptops):
+        with cols[i % 2]:
+            st.image(laptop["img"], use_column_width=True)
+            st.markdown(f"**{laptop['name']}**")
+            st.write(laptop["desc"])
+            st.write(f"### Giá: {laptop['price']:,} VNĐ")
+            if st.button("Thêm vào giỏ", key=f"add_{i}"):
+                st.session_state.cart.append(laptop)
+                st.success(f"Đã thêm {laptop['name']} vào giỏ hàng!")
+    st.markdown("---")
+    show_cart()
+
+# --- ĐIỀU HƯỚNG ---
+if not st.session_state.logged_in:
+    if st.session_state.page == "login":
+        login()
     else:
-        st.session_state.last_result = "<div style='color:#fff;text-align:center;'>Chúc may mắn lần sau!</div>"
-
-# Hiển thị slot
-slot_cols = st.columns(3)
-for i in range(3):
-    slot_cols[i].markdown(f"<div class='slot-symbol'>{st.session_state.slots[i]}</div>", unsafe_allow_html=True)
-
-# Hiển thị kết quả
-if st.session_state.last_result:
-    st.markdown(st.session_state.last_result, unsafe_allow_html=True)
-
-if st.button("Nạp thêm 1000 💰"):
-    st.session_state.balance += 1000
-    st.success("Đã nạp thêm 1000 💰!")
-
-st.markdown('</div>', unsafe_allow_html=True)
-st.info("Chơi giải trí, không dùng cho mục đích cá cược thực tế.")
+        register()
+else:
+    shop()
